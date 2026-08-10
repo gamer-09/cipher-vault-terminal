@@ -41,9 +41,3 @@ MIT
 ---
 **ARCHIVE NOTE:** This repository has been archived. The project (Cipher Vault Terminal v2.0) is preserved for reference but no longer actively maintained. For questions or to view the final build, see the commit history or contact the original maintainer.
 ---
-
-
----
-**ARCHIVE NOTE:** This repository has been archived. The project (Cipher Vault Terminal v2.0) is preserved for reference but no longer actively maintained. For questions or to view the final build, see the commit history or contact the original maintainer.
----
-
