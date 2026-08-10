@@ -5,177 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
   <meta name="theme-color" content="#030308" />
   <title>Cipher Vault Terminal</title>
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="manifest" href="/assets/manifest-DolYIXjg.json" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #030308;
-      --surface: #080816;
-      --surface-2: #0c0c1e;
-      --neon-cyan: #00f0ff;
-      --neon-violet: #a855f7;
-      --text: #eaeaf4;
-      --text-dim: #6e6e80;
-      --glass: rgba(255,255,255,0.03);
-      --border: rgba(255,255,255,0.06);
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; height: 100vh; width: 100vw; overflow: hidden; }
-    body::before {
-      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 50; opacity: 0.3;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px);
-    }
-    .glass { background: var(--glass); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border: 1px solid var(--border); }
-    .glass-strong { background: rgba(8,8,22,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-    .neon-text { text-shadow: 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-violet); }
-    .glow-cyan { box-shadow: 0 0 20px rgba(0,240,255,0.1), inset 0 0 20px rgba(0,240,255,0.04); border-color: rgba(0,240,255,0.2); }
-    .glow-violet { box-shadow: 0 0 20px rgba(168,85,247,0.1), inset 0 0 20px rgba(168,85,247,0.04); border-color: rgba(168,85,247,0.2); }
-    @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    @keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
-    .scanline { animation: scan 8s linear infinite; opacity: 0.2; pointer-events: none; }
+    :root { --bg: #030308; --neon-cyan: #00f0ff; --neon-violet: #a855f7; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: #eaeaf4; font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--neon-cyan), var(--neon-violet)); border-radius: 10px; }
-    .cursor-blink { animation: pulse-slow 1s infinite; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00f0ff, #a855f7); border-radius: 10px; }
   </style>
+  <script type="module" crossorigin src="/assets/index-Dr23cdnq.js"></script>
 </head>
 <body class="antialiased selection:bg-cyan-500/20 selection:text-white">
-
-  <!-- Scanline overlay -->
-  <div class="fixed top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent scanline z-[60]"></div>
-
-  <main class="relative z-10 flex flex-col h-full max-w-3xl mx-auto px-6 py-6 gap-5">
-
-    <!-- Terminal Header -->
-    <header class="glass rounded-2xl px-6 py-4 glow-cyan flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff]"></div>
-        <div class="w-3 h-3 rounded-full bg-violet-400 shadow-[0_0_8px_#a855f7]"></div>
-        <h1 class="font-['Orbitron'] text-xl font-black tracking-tight text-white neon-text ml-3">VAULT TERMINAL</h1>
-      </div>
-      <div class="flex items-center gap-4 text-xs text-dim font-['JetBrains_Mono']">
-        <span class="flex items-center gap-1.5"><i class="ph-fill ph-lock-key text-cyan-300"></i> <span id="vaultStatus">LOCKED</span></span>
-        <span class="flex items-center gap-1.5"><i class="ph-fill ph-shield-check text-violet-300"></i> <span>AES-256</span></span>
-      </div>
-    </header>
-
-    <!-- Main workspace -->
-    <section id="workspace" class="glass-strong rounded-3xl p-8 glow-violet flex flex-col gap-6 flex-1 overflow-y-auto min-h-0 relative">
-
-      <div id="terminalOutput" class="font-['JetBrains_Mono'] text-sm leading-7 text-white/90 space-y-2 min-h-[120px]">
-        <div><span class="text-cyan-400">$</span> vault-terminal initialize</div>
-        <div><span class="text-violet-300">[system]</span> Client-side AES-256-GCM encryption loaded.</div>
-        <div><span class="text-violet-300">[system]</span> Hidden workspace active. Type <span class="text-cyan-300 font-bold">unlock vault</span> anywhere to open private mode.</div>
-        <div><span class="text-violet-300">[system]</span> Type <span class="text-cyan-300 font-bold">help</span> for commands.</div>
-        <div><span class="text-cyan-400">$</span> <span class="text-white/40">_</span><span class="cursor-blink text-cyan-300">|</span></div>
-      </div>
-
-      <div id="hiddenPanel" class="hidden flex-col gap-4 border-t border-[rgba(255,255,255,0.06)] pt-6">
-        <h2 class="font-['Orbitron'] text-lg font-black text-white neon-text">PRIVATE VAULT</h2>
-        <textarea id="vaultText" rows="5" class="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-5 text-sm text-white placeholder:text-dim/30 focus:outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/10 transition resize-none font-['JetBrains_Mono'] leading-relaxed" placeholder="Write or paste encrypted notes..."></textarea>
-        <div class="flex gap-3">
-          <input id="vaultPass" type="text" class="flex-1 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-xl px-5 py-3 text-sm text-white placeholder:text-dim/30 focus:outline-none focus:border-violet-400/40 focus:ring-1 focus:ring-violet-400/10 transition font-['JetBrains_Mono']" placeholder="Passphrase (min 8 chars)" />
-          <button onclick="lockVault()" class="bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-cyan-400/20 text-cyan-300 rounded-xl px-6 py-3 text-sm font-bold hover:from-cyan-500/20 hover:to-violet-500/20 transition shadow-[0_0_15px_rgba(0,240,255,0.08)] flex items-center gap-2">
-            <i class="ph-fill ph-lock-key"></i> Lock Vault
-          </button>
-        </div>
-        <div class="flex gap-2 text-[10px] text-dim/50">
-          <span>• Auto-lock after 5 min inactivity</span>
-          <span>• Key stays in memory only</span>
-          <span>• No backend</span>
-        </div>
-      </div>
-
-      <!-- Input line -->
-      <div class="flex items-end gap-3 mt-auto">
-        <span class="text-cyan-400 font-bold text-lg leading-none mb-3">$</span>
-        <input id="terminalInput" type="text" autocomplete="off" class="flex-1 bg-transparent border-none outline-none text-sm text-white font-['JetBrains_Mono'] placeholder:text-dim/20 py-3 caret-cyan-300" placeholder="Type a command... (try unlock vault)" onkeydown="if(event.key==='Enter'){handleCommand(this.value); this.value='';}" />
-        <span class="cursor-blink text-cyan-300 mb-1">|</span>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="flex items-center justify-between text-[10px] text-dim/40 uppercase tracking-[0.2em] font-['JetBrains_Mono']">
-      <span>Client-side only · Zero backend</span>
-      <span>Vault Terminal v1.0</span>
-    </footer>
-  </main>
-
-  <script>
-    const enc = new TextEncoder();
-    const dec = new TextDecoder();
-
-    async function deriveKey(passphrase, salt) {
-      const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveBits', 'deriveKey']);
-      return crypto.subtle.deriveKey(
-        { name: 'PBKDF2', salt: salt, iterations: 310000, hash: 'SHA-256' },
-        keyMaterial,
-        { name: 'AES-GCM', length: 256 },
-        false,
-        ['encrypt', 'decrypt']
-      );
-    }
-
-    async function encryptText(text, passphrase) {
-      const salt = crypto.getRandomValues(new Uint8Array(16));
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const key = await deriveKey(passphrase, salt);
-      const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(text));
-      const combined = new Uint8Array(salt.length + iv.length + ciphertext.byteLength);
-      combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
-      return btoa(String.fromCharCode.apply(null, combined));
-    }
-
-    async function decryptVault(passphrase) {
-      const data = localStorage.getItem('vault_data');
-      if (!data) return null;
-      const raw = new Uint8Array(atob(data).split('').map(c => c.charCodeAt(0)));
-      const salt = raw.slice(0, 16), iv = raw.slice(16, 28), cipher = raw.slice(28);
-      const key = await deriveKey(passphrase, salt);
-      try {
-        const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
-        return dec.decode(decrypted);
-      } catch (e) { return null; }
-    }
-
-    async function lockVault() {
-      const text = document.getElementById('vaultText').value.trim();
-      const pass = document.getElementById('vaultPass').value.trim();
-      if (!text || !pass) { alert('Enter passphrase'); return; }
-      if (pass.length < 8) { alert('Passphrase must be at least 8 characters'); return; }
-      const b64 = await encryptText(text, pass);
-      localStorage.setItem('vault_data', b64);
-      document.getElementById('hiddenPanel').classList.add('hidden');
-      document.getElementById('hiddenPanel').classList.remove('flex');
-      document.getElementById('vaultStatus').textContent = 'LOCKED';
-      document.getElementById('terminalOutput').innerHTML += `<div><span class="text-violet-300">[system]</span> Vault encrypted and saved locally.</div>`;
-    }
-
-    function handleCommand(cmd) {
-      const out = document.getElementById('terminalOutput');
-      out.innerHTML += `<div><span class="text-cyan-400">$</span> <span class="text-white/70">${escapeHtml(cmd)}</span></div>`;
-      const lower = cmd.toLowerCase();
-      if (lower.includes('unlock') && lower.includes('vault')) {
-        document.getElementById('hiddenPanel').classList.remove('hidden');
-        document.getElementById('hiddenPanel').classList.add('flex');
-        document.getElementById('vaultStatus').textContent = 'UNLOCKED';
-        out.innerHTML += `<div><span class="text-violet-300">[system]</span> Hidden workspace unlocked. Passphrase required to lock.</div>`;
-      } else if (lower === 'help') {
-        out.innerHTML += `<div><span class="text-violet-300">[system]</span> Commands: unlock vault, help, status</div>`;
-      } else if (lower === 'status') {
-        out.innerHTML += `<div><span class="text-violet-300">[system]</span> Crypto: AES-256-GCM · Storage: localStorage · Backend: none</div>`;
-      } else {
-        out.innerHTML += `<div><span class="text-violet-300">[system]</span> Unknown command. Try <span class="text-cyan-300">unlock vault</span> or <span class="text-cyan-300">help</span>.</div>`;
-      }
-      out.scrollTop = out.scrollHeight;
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement('div'); div.textContent = str; return div.innerHTML;
-    }
-  </script>
+  <div id="root"></div>
 </body>
 </html>
