@@ -21,6 +21,7 @@ function App() {
   const [showCreate, setShowCreate] = useState(false);
   const [timer, setTimer] = useState(300);
   const [timerActive, setTimerActive] = useState(false);
+  const [awaitingPassphrase, setAwaitingPassphrase] = useState(false);
   const outputRef = useRef(null);
 
   // Initialize on mount
@@ -68,29 +69,8 @@ function App() {
   }
 
   async function handleUnlock() {
-    const pass = prompt('Enter vault passphrase (min 8 chars):');
-    if (!pass) return;
-    if (pass.length < 8) { addSystem('Passphrase must be at least 8 characters.'); return; }
-    // Try to verify by attempting to load config (if exists) or just set
-    try {
-      const config = await getVaultConfig();
-      if (!config) {
-        // First time setup: create config with passphrase hash reference
-        await setVaultConfig({ createdAt: Date.now(), initialized: true });
-        setVaultPassphrase(pass);
-        setVaultUnlocked(true);
-        addSystem('Hidden workspace unlocked (first-time setup).');
-      } else {
-        // For simplicity in this full app, we assume passphrase matches stored config logic
-        // In a real product, we'd derive and compare. Here we accept and unlock.
-        setVaultPassphrase(pass);
-        setVaultUnlocked(true);
-        addSystem('Hidden workspace unlocked.');
-      }
-      await loadVaultRecords();
-    } catch (e) {
-      addSystem('Failed to unlock vault.');
-    }
+    setAwaitingPassphrase(true);
+    addSystem('Passphrase required. Type or paste your passphrase below (min 8 chars):');
   }
 
   async function handleLock() {
@@ -279,23 +259,57 @@ function App() {
       <main className="flex-1 overflow-hidden flex">
         {/* Left terminal panel */}
         <section className="w-[55%] border-r border-white/[0.05] flex flex-col">
-          <div ref={outputRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-1 text-sm leading-7">
+          <div ref={outputRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-1 text-sm leading-7 scroll-smooth" style={{ scrollbarWidth: 'thin', scrollbarColor: '#00f0ff #030308' }}>
             {commands.map((cmd, i) => (
               <div key={i} className={cmd.type === 'system' ? 'text-[#8a8a9a]' : 'text-white/70'}>
                 {cmd.text}
               </div>
             ))}
           </div>
-          <div className="px-6 pb-4">
+          <div className="px-6 pb-4 flex flex-col gap-1">
+            {awaitingPassphrase && (
+              <div className="text-xs text-cyan-300 font-bold tracking-wider animate-pulse">PASSPHRASE REQUIRED → Type below and press Enter</div>
+            )}
             <div className="flex items-end gap-3 bg-[#080816] border border-white/[0.06] rounded-xl px-4 py-3 glass">
               <span className="text-cyan-400 font-bold">$</span>
               <input
                 type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') { handleCommand(input); setInput(''); } }}
+                onKeyDown={e => {
+                  if (awaitingPassphrase) {
+                    if (e.key === 'Enter') {
+                      const pass = input.trim();
+                      setInput('');
+                      setAwaitingPassphrase(false);
+                      if (!pass) { addSystem('Passphrase entry cancelled.'); return; }
+                      if (pass.length < 8) { addSystem('Passphrase must be at least 8 characters. Try unlock vault again.'); return; }
+                      // Process unlock with passphrase
+                      (async () => {
+                        try {
+                          const config = await getVaultConfig();
+                          if (!config) {
+                            await setVaultConfig({ createdAt: Date.now(), initialized: true });
+                            setVaultPassphrase(pass);
+                            setVaultUnlocked(true);
+                            addSystem('Hidden workspace unlocked (first-time setup).');
+                          } else {
+                            setVaultPassphrase(pass);
+                            setVaultUnlocked(true);
+                            addSystem('Hidden workspace unlocked.');
+                          }
+                          await loadVaultRecords();
+                        } catch (e) {
+                          addSystem('Failed to unlock vault.');
+                        }
+                      })();
+                    }
+                    return;
+                  }
+                  if (e.key === 'Enter') { handleCommand(input); setInput(''); }
+                }}
                 className="flex-1 bg-transparent outline-none text-white placeholder:text-white/20 text-sm font-['JetBrains_Mono']"
-                placeholder="Type command... (unlock vault, list, create, help)"
+                placeholder={awaitingPassphrase ? "Enter passphrase (min 8 chars)..." : "Type command... (unlock vault, list, create, help)"}
                 autoFocus
               />
               <span className="text-cyan-300 animate-pulse">|</span>
