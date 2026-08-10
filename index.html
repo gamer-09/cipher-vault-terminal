@@ -14,10 +14,11 @@
   <style>
     :root { --bg: #030308; --neon-cyan: #00f0ff; --neon-violet: #a855f7; }
     html, body { margin: 0; padding: 0; background: var(--bg); color: #eaeaf4; font-family: 'JetBrains Mono', monospace; height: 100vh; overflow: hidden; }
-    ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: #030308; border-left: 1px solid rgba(255,255,255,0.05); }
-    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00f0ff, #a855f7); border-radius: 5px; border: 2px solid #030308; }
-    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #00f0ff, #00ccff); }
+    ::-webkit-scrollbar { width: 14px; height: 14px; }
+    ::-webkit-scrollbar-track { background: #030308; border-left: 2px solid rgba(255,255,255,0.06); border-radius: 0; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00f0ff, #a855f7); border-radius: 7px; border: 3px solid #030308; }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #00f0ff, #00ccff); border: 2px solid #030308; }
+    ::-webkit-scrollbar-corner { background: #030308; }
   </style>
 </head>
 <body class="antialiased selection:bg-cyan-500/20 selection:text-white">
