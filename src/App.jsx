@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Lock, Unlock, Shield, Folder, Search, Trash2, Download, Upload, Settings, Clock, Check, X, Plus, FileText, FileImage, ChevronRight, ShieldCheck, FolderOpen, FolderPlus } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Lock, Shield, Search, Trash2, Download, Upload, Clock, Plus, FileText } from 'lucide-react';
 import { deriveKey, encryptData, decryptData } from './crypto';
 import { getMeta, setMeta, getVaultConfig, setVaultConfig, getAllVaultRecords, putVaultRecord, deleteVaultRecord, replaceAllVaultRecords } from './db';
 
@@ -22,6 +22,7 @@ function App() {
   const [timer, setTimer] = useState(300);
   const [timerActive, setTimerActive] = useState(false);
   const [awaitingPassphrase, setAwaitingPassphrase] = useState(false);
+  const [userScrolledUp, setUserScrolledUp] = useState(false);
   const outputRef = useRef(null);
 
   // Initialize on mount
@@ -48,7 +49,13 @@ function App() {
   }, [vaultUnlocked]);
 
   useEffect(() => {
-    if (outputRef.current) outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    if (outputRef.current) {
+      const el = outputRef.current;
+      const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
+      if (!userScrolledUp || nearBottom) {
+        el.scrollTop = el.scrollHeight;
+      }
+    }
   }, [commands]);
 
   async function loadVaultRecords() {
@@ -258,8 +265,11 @@ function App() {
       {/* Main workspace */}
       <main className="flex-1 overflow-hidden flex">
         {/* Left terminal panel */}
-        <section className="w-[55%] border-r border-white/[0.05] flex flex-col" style={{ minHeight: 0 }}>
-          <div ref={outputRef} className="flex-1 overflow-y-scroll px-6 py-6 pr-3 space-y-1 text-sm leading-7 scroll-smooth" style={{ scrollbarWidth: 'auto', scrollbarColor: '#00f0ff #030308', overflowY: 'scroll' }}>
+        <section className="w-[55%] border-r border-white/[0.05] flex flex-col" style={{ minHeight: 0, height: 'calc(100vh - 80px)' }}>
+          <div ref={outputRef} onScroll={(e) => {
+            const el = e.currentTarget;
+            setUserScrolledUp(el.scrollTop + el.clientHeight < el.scrollHeight - 40);
+          }} className="overflow-y-auto px-6 py-6 pr-3 space-y-1 text-sm leading-7" style={{ maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', scrollbarWidth: 'auto', scrollbarColor: '#00f0ff #030308', overscrollBehavior: 'contain' }} aria-label="Terminal output history">
             {commands.map((cmd, i) => (
               <div key={i} className={cmd.type === 'system' ? 'text-[#8a8a9a]' : 'text-white/70'}>
                 {cmd.text}
@@ -282,8 +292,8 @@ function App() {
                       const pass = input.trim();
                       setInput('');
                       setAwaitingPassphrase(false);
-                      if (!pass) { addSystem('Passphrase entry cancelled.'); return; }
-                      if (pass.length < 8) { addSystem('Passphrase must be at least 8 characters. Try unlock vault again.'); return; }
+                      if (!pass) { addSystem('Passphrase entry cancelled.'); setAwaitingPassphrase(false); return; }
+                      if (pass.length < 8) { addSystem('Passphrase must be at least 8 characters. Try unlock vault again.'); setAwaitingPassphrase(false); return; }
                       // Process unlock with passphrase
                       (async () => {
                         try {
