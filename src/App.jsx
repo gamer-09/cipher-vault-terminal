@@ -259,7 +259,7 @@ function App() {
       <main className="flex-1 overflow-hidden flex">
         {/* Left terminal panel */}
         <section className="w-[55%] border-r border-white/[0.05] flex flex-col">
-          <div ref={outputRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-1 text-sm leading-7 scroll-smooth" style={{ scrollbarWidth: 'thin', scrollbarColor: '#00f0ff #030308' }}>
+          <div ref={outputRef} className="flex-1 overflow-y-auto px-6 py-6 pr-3 space-y-1 text-sm leading-7 scroll-smooth" style={{ scrollbarWidth: 'auto', scrollbarColor: '#00f0ff #030308' }}>
             {commands.map((cmd, i) => (
               <div key={i} className={cmd.type === 'system' ? 'text-[#8a8a9a]' : 'text-white/70'}>
                 {cmd.text}
