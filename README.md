@@ -1,3 +1,9 @@
+> ## 📦 Archived
+>
+> **This project is no longer actively maintained.** The repository is kept available for reference and forking, but no further updates, bug fixes, or new features are planned, and issues/pull requests may not be reviewed.
+>
+> The final build (Cipher Vault Terminal v2.0) still works as documented below — see the commit history for the last changes. If you'd like to take the idea further, feel free to **fork it** (MIT licensed).
+
 # Cipher Vault Terminal
 
 A terminal-style encrypted workspace with a hidden vault unlock, neon command-center HUD, and client-side AES-256-GCM encryption. Zero backend. PWA-ready.
@@ -38,6 +44,3 @@ sw.js             Service worker for offline caching
 
 MIT
 
----
-**ARCHIVE NOTE:** This repository has been archived. The project (Cipher Vault Terminal v2.0) is preserved for reference but no longer actively maintained. For questions or to view the final build, see the commit history or contact the original maintainer.
----
